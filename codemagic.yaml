@@ -1,0 +1,172 @@
+workflows:
+  react-native:
+    name: React Native App
+    max_build_duration: 120
+    scripts:
+      - |
+        # Install Java 20
+        wget -qO- https://api.adoptopenjdk.net/v3/binary/latest/20/ga/linux/x64/jdk/hotspot/normal/adoptopenjdk | tar zx
+        export JAVA_HOME=$(pwd)/jdk-20
+        export PATH=$JAVA_HOME/bin:$PATH
+
+      # Continue with your build steps
+      - echo $JAVA_HOME
+      - java -version  
+      - npm update 
+      - npm install 
+      - npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+      - echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
+      - |
+        # build Android
+        cd android && chmod +x gradlew && ./gradlew clean
+        ./gradlew assembleDebug --warning-mode
+
+    artifacts:
+      - android/app/build/outputs/**/*.apk
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# workflows:
+#   react-native:
+#     name: React Native App
+#     max_build_duration: 120
+#     # environment:
+#     #   groups:
+#     #     - aws
+#        # Define JAVA_HOME
+#     scripts:
+#       - sdk install java 20.0.0-open
+#      # - export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-20.jdk/Contents/Home
+#       - echo $JAVA_HOME
+#       - java -version  # Verify Java installation
+#       - npm update 
+#       - npm install 
+#       - npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+#       - echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
+#       - |
+#           # build Android
+#           cd android && chmod +x gradlew && ./gradlew clean
+#           ./gradlew assembleDebug --warning-mode
+
+#     artifacts:
+#       - android/app/build/outputs/**/*.apk
+
+
+# workflows:
+#   react-native:
+#     name: React Native App
+#     max_build_duration: 120
+#     environment:
+#       groups:
+#         - react
+#       vars:
+#         XCODE_WORKSPACE: "{{ Ticket }}"
+#         XCODE_SCHEME: "{{ Ticket-App }}"
+#         node: latest
+#     scripts:
+#       - npm update 
+#       - npm install 
+#       - npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+#       - echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
+#       - |
+#           # build Android
+#           cd android && chmod +x gradlew && gradlew clean
+#           ./gradlew assembleDebug --warning-mode all --stacktrace --info
+#     artifacts:
+#       - android/app/build/outputs/**/*.apk
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#  workflows:
+#   react-native:
+#     name: React Native App
+#     max_build_duration: 120
+#     environment:
+#       groups:
+#         - react
+#       vars:
+#         XCODE_WORKSPACE: "{{ Ticket }}"
+#         XCODE_SCHEME: "{{ Ticket-App }}"
+#         node: latest
+#     scripts:
+      
+#       - npm update 
+#       - npm install 
+#       - npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+#       - echo "sdk.dir=$HOME/programs/android-sdk-macosx"> "$FCI_BUILD_DIR/android/local.properties"
+#       - | 
+#           # build Android
+#           cd android && chmod +x gradlew
+#           ./gradlew assembleDebug --warning-mode all
+#     artifacts:
+#       - android/app/build/outputs/**/*.apk
+
+
+
+
+
+
+
+
+#      #notification
+#     publishing:
+#       email:
+#         recipients:
+#           - manimv1268@gmail.com
+#         #build success or fails 
+#         notify:
+#           success: true      #To not receive a notification when a build succeeds
+#           failure: false     #To not receive a notification when a build fails  
+
+

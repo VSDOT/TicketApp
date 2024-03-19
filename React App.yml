@@ -1,0 +1,164 @@
+name: React App Build
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: install java
+      uses: actions/setup-java@v3
+      with: 
+        java-version: 17
+        distribution: adopt
+        cache: gradle
+
+    - name: Validate Gradle wrapper
+      uses: gradle/wrapper-validation-action@v1
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v2
+      with:
+        sdk-platform: 'platforms;android-29'
+
+    - name: Create local.properties file
+      run: echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties  
+
+    - name: Build Android app
+      run: |
+           npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+           cd android && chmod +x gradlew
+           ./gradlew assembleDebug --warning-mode all
+    - name: Upload application
+      uses: actions/upload-artifact@v2
+      with:
+         name: app
+         path: android/app/build/outputs/**/*.apk
+         retention-days: 3      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# name: React App Build
+
+# on:
+#   push:
+#     branches:
+#       - master
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v2
+
+#     - name: install java
+#       uses: actions/setup-java@v3
+#       with: 
+#         java-version: 17
+#         distribution: adopt
+#         cache: gradle
+
+#     - name: Validate Gradle wrapper
+#       uses: gradle/wrapper-validation-action@v1
+
+#     - name: Set up Node.js
+#       uses: actions/setup-node@v2
+#       with:
+#         node-version: '18'
+
+#     - name: Install Expo CLI
+#       run: npm install -g expo-cli
+  
+#     - name: Install dependencies
+#       run: npm install
+    
+#     - name: Install CocoaPods dependencies
+#       run: |
+#           cd ios
+#           pod install
+#           cd ..
+
+#     - name: Set up provisioning profiles settings on Xcode project
+#       run: xcode-project use-profiles
+
+#     - name: Build IPA for distribution
+#       run: |
+#         xcode-project build-ipa \
+#           --workspace "$CM_BUILD_DIR/ios/$XCODE_WORKSPACE" \
+#           --scheme "$XCODE_SCHEME"      
+
+#     - name: Set up Android SDK
+#       uses: android-actions/setup-android@v2
+#       with:
+#         sdk-platform: 'platforms;android-29'
+
+#     - name: Create local.properties file
+#       run: echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties  
+
+#     - name: Build Android app
+#       run: |
+#            npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+#            cd android && chmod +x gradlew
+#            ./gradlew assembleDebug --warning-mode all
+#     - name: Upload application
+#       uses: actions/upload-artifact@v2
+#       with:
+#          name: app
+#          path: android/app/build/outputs/**/*.apk
+#          retention-days: 3  
+
+#     - name: Sign AAB
+#       id: sign
+#       uses: r0adkll/sign-android-release@v1
+#       with:
+#         releaseDirectory: app/build/outputs/bundle/release
+#         signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+#         alias: ${{ secrets.ALIAS }}
+#         keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+#         keyPassword: ${{ secrets.KEY_PASSWORD }}           
+
+#     - name: Deploy to Play Store
+#       uses: r0adkll/upload-google-play@v1
+#       with:
+#         serviceAccountJson: ${{ secrets.PLAY_STORE_JSON_KEY }}
+#         packageName: Coffee-Shop-App
+#         releaseFile: android/app/build/outputs/**/*.apk
+#         track: production    
+
+          
